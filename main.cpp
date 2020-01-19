@@ -19,28 +19,33 @@ public:
             int l = startL;
             int r = startR;
             bool hasSame = false;
-            while (s[l] == s[r])
+            while (true)
             {
-                hasSame = true;
-                if (l - 1 >= 0 && r + 1 < length)
+                if (s[l] == s[r])
                 {
-                    l -= 1;
-                    r += 1;
+                    if (l - 1 >= 0 && r + 1 < length)
+                    {
+                        --l;
+                        ++r;
+                    }
+                    else
+                    {
+                        break;
+                    }
                 }
                 else
                 {
+                    ++l;
+                    --r;
                     break;
                 }
             }
 
-            if (hasSame)
+            int curLength = r - l + 1;
+            if (curLength > maxLenght)
             {
-                int curLength = r - l + 1;
-                if (curLength > maxLenght)
-                {
-                    maxLenght = curLength;
-                    resultL = l;
-                }
+                maxLenght = curLength;
+                resultL = l;
             }
 
             if (startL == startR)
@@ -71,7 +76,7 @@ int main()
     //{
     //    std::cout << "hello world" << std::endl;
     //}
-    string s = "aaccbbccefg";
+    string s = "abcdefg";
     Solution solution = Solution();
     string result = solution.longestPalindrome(s);
     std::cout << result << std::endl;
