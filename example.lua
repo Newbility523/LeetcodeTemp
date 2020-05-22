@@ -1,27 +1,3 @@
-
-local OPERA_IN = 0
-local OPERA_OUT = 1
-
-local Q = {
-    data = {},
-    maxLength = 0,
-    head = 0,
-    tail = 0,
-    lastOpera = 0,
-
-    -- func
-    new = false,
-    Init = false,
-    Enqueue = false,
-    Dequeue = false,
-    Clear = false,
-    Peek = false,
-    Count = false,
-    Contains = false,
-    Contains = false,
-    print = false,
-}
-
 local mt = {
     __index = function (t, k)
         print("not support index not exit value", k)
@@ -30,46 +6,54 @@ local mt = {
 
     __newindex = function (t, k, v)
         print("not support index not exit value 2", k)
-        return false
     end
 }
 
-setmetatable(Q, mt)
+local OPERA_IN = 0
+local OPERA_OUT = 1
 
-function Q:new(lenght)
-    self.maxLength = lenght
-    self:Init()
+local data = {}
+local maxLength = 0
+local head = 0
+local tail = 0
+local lastOpera = 0
+
+local Q = {}
+
+function Q.new(lenght)
+    maxLength = lenght
+    Q.Init()
 end
 
-function Q:Init()
-    self.data = {}
-    self.head = 1
-    self.tail = 1 
-    self.lastOpera = OPERA_OUT
+function Q.Init()
+    data = {}
+    head = 1
+    tail = 1 
+    lastOpera = OPERA_OUT
 end
 
-function Q:Enqueue(item)
-    self.data[self.tail] = item
-    if self.head == self.tail and self.lastOpera == OPERA_IN then
-        self.tail = self.tail % self.maxLength + 1
-        self.head = self.head % self.maxLength + 1
-        -- print("special add, head, tail", self.head, self.tail)
+function Q.Enqueue(item)
+    data[tail] = item
+    if head == tail and lastOpera == OPERA_IN then
+        tail = tail % maxLength + 1
+        head = head % maxLength + 1
+        -- print("special add, head, tail", head, tail)
     else
-        self.tail = self.tail % self.maxLength + 1
-        -- print("normal add, head, tail", self.head, self.tail)
+        tail = tail % maxLength + 1
+        -- print("normal add, head, tail", head, tail)
     end
 
-    self.lastOpera = OPERA_IN
+    lastOpera = OPERA_IN
 end
 
-function Q()
-    if self.head ~= self.tail or self.lastOpera == OPERA_IN then
-        -- print("removing at ", self.head)
-        local item = self.data[self.head]
-        self.data[self.head] = false
-        self.head = self.head % self.maxLength + 1
-        -- print("now head, preTail, tail", self.head, self.tail)
-        self.lastOpera = OPERA_OUT
+function Q.Dequeue()
+    if head ~= tail or lastOpera == OPERA_IN then
+        -- print("removing at ", head)
+        local item = data[head]
+        data[head] = false
+        head = head % maxLength + 1
+        -- print("now head, preTail, tail", head, tail)
+        lastOpera = OPERA_OUT
 
         return item
     end
@@ -77,13 +61,13 @@ function Q()
     return false
 end
 
-function Q:Clear()
-    self:Init()
+function Q.Clear()
+    Q.Init()
 end
 
-function Q:Peek()
-    if self.head ~= self.tail or self.lastOpera == OPERA_IN then
-        local item = self.data[self.head]
+function Q.Peek()
+    if head ~= tail or lastOpera == OPERA_IN then
+        local item = data[head]
 
         return item
     end
@@ -91,25 +75,25 @@ function Q:Peek()
     return false
 end
 
-function Q:Count()
-    if self.head ~= self.tail then
-        local length = self.tail - self.head
-        length = length % self.maxLength
+function Q.Count()
+    if head ~= tail then
+        local length = tail - head
+        length = length % maxLength
 
         return length
     else
-        return self.lastOpera == OPERA_IN and self.maxLength or 0
+        return lastOpera == OPERA_IN and maxLength or 0
     end
 end
 
-function Q:Contains(item)
-    local length = self:Count()
+function Q.Contains(item)
+    local length = Q.Count()
     if length == 0 then
         return false
     else
         for k = 0, length - 1 do
-            local realK = (self.head - 1 + k) % self.maxLength + 1
-            if self.data[realK] == item then
+            local realK = (head - 1 + k) % maxLength + 1
+            if data[realK] == item then
                 return true
             end
         end
@@ -118,8 +102,8 @@ function Q:Contains(item)
     return false
 end
 
-function Q:Contains(compare)
-    local length = self:Count()
+function Q.Contains(compare)
+    local length = Q.Count()
     if length == 0 then
         return false
     else
@@ -137,8 +121,8 @@ function Q:Contains(compare)
         end
 
         for k = 0, length - 1 do
-            local realK = (self.head - 1 + k) % self.maxLength + 1
-            local item = self.data[realK]
+            local realK = (head - 1 + k) % maxLength + 1
+            local item = data[realK]
             if compareType == 0 then
                 if item == compare then
                     return true
@@ -154,10 +138,10 @@ function Q:Contains(compare)
     return false
 end
 
-function Q:print()
+function Q.print()
     local result = ""
-    for i = 1, self.maxLength do
-        local item = self.data[i]
+    for i = 1, maxLength do
+        local item = data[i]
         local output = item and item or "X"
         result = result .. output .. " "
     end
@@ -165,12 +149,8 @@ function Q:print()
     print(result)
 end
 
-------
-
--- Q:new(5)
-
-Q.a = 0
-Q.maxLength = 1
+Q = setmetatable(Q, mt)
+-- Q.new(5)
 
 -- print("i - input\no - output\nl - length\nf - find\ne - exit")
 
@@ -180,19 +160,19 @@ Q.maxLength = 1
 --         print("input:")
 --         local input = io.read("*n")
 --         if input then
---             Q:Enqueue(input)
---             Q:print()
+--             Q.Enqueue(input)
+--             Q.print()
 --         end
 --     elseif type == "o" then
---         Q:Dequeue()
---         Q:print()
+--         Q.Dequeue()
+--         Q.print()
 --     elseif type == "l" then
---         print("lenght = ", Q:Count())
+--         print("lenght = ", Q.Count())
 --     elseif type == "f" then
 --         print("find:")
 --         local input = io.read("*n")
 --         if input then
---             print("exit = ", Q:Contains(input))
+--             print("exit = ", Q.Contains(input))
 --         end
 --     elseif type == "e" then
 --         break
@@ -201,10 +181,4 @@ Q.maxLength = 1
 --     print("\n---------------------------")
 -- end
 
-print("a")
-
-
-
-
-
-
+return Q
